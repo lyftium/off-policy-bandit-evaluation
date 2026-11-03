@@ -1,11 +1,10 @@
 # Off-Policy Evaluation of Recommendation Policies on 1.37M Real Bandit Logs
 
-[![CI](https://github.com/lyftium/off-policy-bandit-evaluation/actions/workflows/ci.yml/badge.svg)](https://github.com/lyftium/off-policy-bandit-evaluation/actions/workflows/ci.yml)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue) ![license](https://img.shields.io/badge/license-MIT-green)
 
 **Question.** Can we tell how a new recommendation policy *would* perform from logs collected by a different policy, before running an A/B test? And which candidate policy should we ship?
 
-**Answer (on real data).** Yes, within ~5–6% relative error. Estimates computed only from uniform-random logs land close to the *actual* on-policy CTR of the production policy, and the 95% CIs of IPW, SNIPW and DR cover it. Using those estimators, a simple per-slot popularity policy learned on the first 70% of the week is estimated at **~2.1× the logging policy's CTR** on the held-out 30%.
+**Answer (on real data).** Yes, within 5.3–6.1% relative error. Estimates computed only from uniform-random logs land close to the *actual* on-policy CTR of the production policy, and the 95% CIs of IPW, SNIPW and DR cover it. Using those estimators, a simple per-slot popularity policy learned on the first 70% of the week is estimated at **~2.1× the logging policy's CTR** on the held-out 30%.
 
 ## Data
 [Open Bandit Dataset](https://research.zozo.com/data_release/open_bandit_dataset.zip) (Saito et al., NeurIPS Datasets & Benchmarks 2021; ZOZOTOWN fashion e-commerce; CC BY 4.0). Two campaigns ran in parallel over the same 7 days:
