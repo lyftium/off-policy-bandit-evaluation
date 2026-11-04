@@ -7,7 +7,7 @@
 | **Problem** | Can we rank a new recommendation policy from logs of a different policy before an A/B test? |
 | **Verify** | `pytest -q` (no data download) · `results.json` from `scripts/run_experiments.py` (seed 0) · numbers below match that file |
 | **CI-ready** | [`ci/github-actions-ci.yml`](ci/github-actions-ci.yml) — enable with `bash scripts/install-github-actions.sh` once `workflow` scope is granted |
-| **Status** | Real Open Bandit Dataset; unit tests offline. Full campaign needs the public zip (~15 min). CI written, not enabled. |
+| **Status** | Real Open Bandit Dataset; unit tests offline. Full campaign needs the public zip (~15 min). CI written, not enabled. Release example: [`releases/example-obd-seed0.json`](releases/example-obd-seed0.json). |
 
 **Answer (on real data).** Yes, within 5.3–6.1% relative error. Estimates computed only from uniform-random logs land close to the *actual* on-policy CTR of the production policy, and the 95% CIs of IPW, SNIPW and DR cover it. Using those estimators, a simple per-slot popularity policy learned on the first 70% of the week is estimated at **~2.1× the logging policy's CTR** on the held-out 30%.
 
