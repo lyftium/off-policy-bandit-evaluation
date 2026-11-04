@@ -1,0 +1,21 @@
+# CI-ready: copy into .github/workflows/ via scripts/install-github-actions.sh
+# once the repo token has `workflow` scope.
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Unit tests (no dataset download)
+        run: pytest -q
+      - name: results.json present
+        run: python -c "import json; d=json.load(open('results.json')); assert 'e1' in d and 'e2' in d and 'e3' in d"
