@@ -6,16 +6,20 @@
 
 | | |
 |---|---|
-| **Problem** | Can we rank a new recommendation policy from logs of a different policy before an A/B test? |
+| **Problem** | Can we rank a new recommendation policy from logs of a different policy before an A/B test? (data-science decision problem) |
 | **Verify** | [`docs/DEMO.md`](docs/DEMO.md) · `pytest -q` (no data download) · `results.json` from `scripts/run_experiments.py` (seed 0) · numbers below match that file |
 | **CI** | ![CI](https://github.com/lyftium/off-policy-bandit-evaluation/actions/workflows/ci.yml/badge.svg) — workflow live under [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 | **Status** | Real Open Bandit Dataset; unit tests offline. Full campaign needs the public zip (~15 min). CI **enabled** on `main` (see badge). Release example: [`releases/example-obd-seed0.json`](releases/example-obd-seed0.json). |
 
 **Answer (on real data).** Yes, within 5.3–6.1% relative error. Estimates computed only from uniform-random logs land close to the *actual* on-policy CTR of the production policy, and the 95% CIs of IPW, SNIPW and DR cover it. Using those estimators, a simple per-slot popularity policy learned on the first 70% of the week is estimated at **~2.1× the logging policy's CTR** on the held-out 30%.
 
+## Data scientist signals
+
+This repo is the public **decision-evaluation** artefact: a business question (rank a policy before A/B), real logged data (1.37 M rounds), EDA under rare clicks, estimators with **bootstrap CIs**, a chronological hold-out, and an explicit refusal of an over-confident Direct Method. Numbers below are only those in [`results.json`](results.json).
+
 ## Integrator signals
 
-Decision policies need **evaluation before A/B**: recover a known on-policy CTR from logged propensities (IPW / SNIPW / DR), then rank candidates on a chronological hold-out. Every number in the tables below is in [`results.json`](results.json) — do not invent extras.
+Decision policies need **evaluation before A/B**: recover a known on-policy CTR from logged propensities (IPW / SNIPW / DR), then rank candidates on a chronological hold-out. Same discipline as promoting a model component — score first, then ship.
 
 ## Data
 [Open Bandit Dataset](https://research.zozo.com/data_release/open_bandit_dataset.zip) (Saito et al., NeurIPS Datasets & Benchmarks 2021; ZOZOTOWN fashion e-commerce; CC BY 4.0). Two campaigns ran in parallel over the same 7 days:
