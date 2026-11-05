@@ -13,6 +13,10 @@
 
 **Answer (on real data).** Yes, within 5.3–6.1% relative error. Estimates computed only from uniform-random logs land close to the *actual* on-policy CTR of the production policy, and the 95% CIs of IPW, SNIPW and DR cover it. Using those estimators, a simple per-slot popularity policy learned on the first 70% of the week is estimated at **~2.1× the logging policy's CTR** on the held-out 30%.
 
+## Integrator signals
+
+Decision policies need **evaluation before A/B**: recover a known on-policy CTR from logged propensities (IPW / SNIPW / DR), then rank candidates on a chronological hold-out. Every number in the tables below is in [`results.json`](results.json) — do not invent extras.
+
 ## Data
 [Open Bandit Dataset](https://research.zozo.com/data_release/open_bandit_dataset.zip) (Saito et al., NeurIPS Datasets & Benchmarks 2021; ZOZOTOWN fashion e-commerce; CC BY 4.0). Two campaigns ran in parallel over the same 7 days:
 
