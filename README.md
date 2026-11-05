@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | **Problem** | Can we rank a new recommendation policy from logs of a different policy before an A/B test? |
-| **Verify** | `pytest -q` (no data download) · `results.json` from `scripts/run_experiments.py` (seed 0) · numbers below match that file |
+| **Verify** | [`docs/DEMO.md`](docs/DEMO.md) · `pytest -q` (no data download) · `results.json` from `scripts/run_experiments.py` (seed 0) · numbers below match that file |
 | **CI** | ![CI](https://github.com/lyftium/off-policy-bandit-evaluation/actions/workflows/ci.yml/badge.svg) — workflow live under [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 | **Status** | Real Open Bandit Dataset; unit tests offline. Full campaign needs the public zip (~15 min). CI **enabled** on `main` (see badge). Release example: [`releases/example-obd-seed0.json`](releases/example-obd-seed0.json). |
 
