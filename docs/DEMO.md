@@ -5,7 +5,7 @@ Walkthrough for a screener. Stick to artefacts in this repo.
 ## 90 seconds
 
 1. **Question:** can we rank a new policy from another policy’s logs before an A/B?
-2. Open the README lead (5.3–6.1 % recovery claim), then the E1 table — every digit must match [`results.json`](../results.json).
+2. Open the README **Problem / Verify** table and Answer line (5.3–6.1 % recovery), then the E1 table — every digit must match [`results.json`](../results.json).
 3. Point at the CI badge and `pytest -q` (no data download).
 4. **Limits out loud:** fashion e-commerce OBD, not aerospace; estimated lift ≠ observed A/B; full campaign needs the public zip (~15 min).
 
