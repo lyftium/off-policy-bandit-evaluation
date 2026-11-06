@@ -1,12 +1,18 @@
-# Off-policy evaluation on 1.37 M Open Bandit logs
+# Off-Policy Evaluation of Recommendation Policies on 1.37M Real Bandit Logs
 
 ![CI](https://github.com/lyftium/off-policy-bandit-evaluation/actions/workflows/ci.yml/badge.svg)
 
-Can you tell whether a new recommender is better **before** you burn an A/B test?
+![python](https://img.shields.io/badge/python-3.10%2B-blue) ![license](https://img.shields.io/badge/license-MIT-green)
 
-I ran that question on ZOZOTOWN’s Open Bandit Dataset. From the uniform-random logs alone, IPW / SNIPW / DR land within **5.3–6.1 %** of the production Bernoulli-TS CTR, and their 95 % bootstrap CIs cover the truth. Direct Method looks precise and misses. On a chronological hold-out, a per-slot popularity policy comes out around **2.1×** the logger — a candidate for A/B, not a ship decision from the estimate alone.
+| | |
+|---|---|
+| **Problem** | Can we rank a new recommendation policy from logs of a different policy before an A/B test? |
+| **Verify** | [`docs/DEMO.md`](docs/DEMO.md) · `pytest -q` (no data download) · [`results.json`](results.json) from `scripts/run_experiments.py` (seed 0) |
+| **Status** | Real Open Bandit Dataset; unit tests offline. Full campaign needs the public zip (~15 min). CI enabled on `main`. Release example: [`releases/example-obd-seed0.json`](releases/example-obd-seed0.json). |
 
-Everything below is in [`results.json`](results.json) (seed 0). Fashion e-commerce logs, not aerospace. Screener path: [`docs/DEMO.md`](docs/DEMO.md).
+**Answer (on real data).** Yes, within **5.3–6.1 %** relative error. Estimates computed only from uniform-random logs land close to the actual on-policy CTR of the production policy, and the 95 % CIs of IPW, SNIPW and DR cover it. Direct Method’s CI is tiny and misses. Using those estimators, a simple per-slot popularity policy learned on the first 70 % of the week is estimated at **~2.1× the logging policy’s CTR** on the held-out 30 % — a candidate for a confirmatory A/B, not a shipped result from the estimate alone.
+
+Fashion e-commerce OBD logs (ZOZOTOWN), not aerospace.
 
 [Data](#data) · [Method](#method) · [Results](#results) · [Takeaways](#takeaways) · [Reproduce](#reproduce)
 
@@ -33,7 +39,7 @@ Clicks are rare (0.35%), so variance is the main enemy. The slot effect is small
 
 Three experiments:
 
-1. **E1 — estimator check.** Estimate BTS value from random logs only; compare to on-policy BTS CTR.
+1. **E1 — estimator validation.** Estimate BTS value from random logs only; compare to on-policy BTS CTR.
 2. **E2 — policy selection.** Chronological 70/30; learn on the first 70%, evaluate off-policy on the last 412,299 rounds.
 3. **E3 — online learners.** Replay evaluation (Li et al., 2011) — unbiased because the logger is uniform.
 
