@@ -6,9 +6,9 @@ Can you rank a new recommendation policy from another policy’s logs **before**
 
 On the Open Bandit Dataset the answer is yes, within **5.3–6.1 %** relative error. IPW / SNIPW / DR estimates from uniform-random logs land near the production Bernoulli-TS CTR, and their 95 % bootstrap CIs cover it. Direct Method’s CI is tiny and misses the truth. With the honest estimators, a per-slot popularity policy looks about **2.1×** the logger on a chronological hold-out — worth an A/B, not a ship decision by itself.
 
-> **Start here:** [`docs/DEMO.md`](docs/DEMO.md) · numbers in [`results.json`](results.json) (seed 0)  
-> **Stack:** Python 3.10+ · GBDT reward model · DM / IPW / SNIPW / DR · 200 bootstrap CIs  
-> **Limit:** fashion e-commerce OBD, not aerospace; estimated lift ≠ observed A/B
+**Start here:** [`docs/DEMO.md`](docs/DEMO.md) — every number below is in [`results.json`](results.json) (seed 0).
+
+Python 3.10+, a GBDT reward model, DM / IPW / SNIPW / DR with 200 bootstrap CIs. Domain is fashion e-commerce OBD, not aerospace; estimated lift is not an observed A/B.
 
 [Data](#data) · [Method](#method) · [Results](#results) · [Takeaways](#takeaways) · [Reproduce](#reproduce)
 
