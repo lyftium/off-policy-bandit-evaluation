@@ -1,36 +1,37 @@
-# Interview demo — off-policy evaluation
+# Demo — off-policy evaluation
 
-Walkthrough for a screener. Stick to artefacts in this repo.
+Reproduce the offline tests and inspect published results. No A/B claim; numbers come from [`results.json`](../results.json) (seed 0).
 
-## 90 seconds
+## Prerequisites
 
-1. **Question:** can we rank a new policy from another policy’s logs before an A/B?
-2. Open the README **Problem / Verify** table and Answer line (5.3–6.1 % recovery), then the E1 table — every digit must match [`results.json`](../results.json).
-3. Point at the CI badge and `pytest -q` (no data download).
-4. **Limits out loud:** fashion e-commerce OBD, not aerospace; estimated lift ≠ observed A/B; full campaign needs the public zip (~15 min).
+- Python 3.10+
+- ~few minutes for unit tests; ~15 min + download for the full Open Bandit campaign
 
-## 10 minutes
+## Quick check (no data download)
 
 ```bash
 pip install -e ".[dev]"
 pytest -q
-# optional (~15 min + download):
-# curl -LO https://research.zozo.com/data_release/open_bandit_dataset.zip
-# unzip open_bandit_dataset.zip -d data/
-# PYTHONPATH=src python scripts/run_experiments.py --data data/open_bandit_dataset
 ```
 
-| Minute | Show | Say |
-|---|---|---|
-| 0–2 | README lead + question | Score candidates from logs before A/B |
-| 2–4 | E1 vs `results.json` | IPW / SNIPW / DR recover BTS CTR within 5.3–6.1 %; DM’s CI misses truth |
-| 4–6 | E2 ranking | Popularity beats model-greedy; wide CI → A/B candidate, not shipped |
-| 6–8 | Estimators + cross-fit DR | Importance weights + honest uncertainty |
-| 8–9 | Eval-before-ship | Same habit as promoting any ML component |
-| 9–10 | Limits | Only quote digits in `results.json` |
+**Expected:** all tests pass.
 
-## Do not claim
+## Inspect published results
 
-- Aerospace or customer production bandit logs
-- Digits not in `results.json`
-- That DM’s tight CI is trustworthy here (it excludes the truth)
+Open [`results.json`](../results.json) and the README E1 / E2 tables. Digits should match.
+
+## Full campaign (optional)
+
+```bash
+curl -LO https://research.zozo.com/data_release/open_bandit_dataset.zip
+unzip open_bandit_dataset.zip -d data/
+PYTHONPATH=src python scripts/run_experiments.py --data data/open_bandit_dataset
+```
+
+**Expected:** a new `results.json` consistent with the published seed-0 campaign (allow for environment noise on wall time only).
+
+## Limitations
+
+- Fashion e-commerce Open Bandit logs — not aerospace or customer production data
+- Estimated policy lift ≠ observed A/B outcome
+- Full campaign needs the public zip
