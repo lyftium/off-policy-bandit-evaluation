@@ -4,45 +4,48 @@
 
 Can you rank a new recommendation policy from another policy’s logs **before** an A/B test?
 
-On the Open Bandit Dataset the answer is yes, within **5.3–6.1 %** relative error: IPW / SNIPW / DR estimates from uniform-random logs land near the production Bernoulli-TS CTR, and their 95 % bootstrap CIs cover it. Direct Method’s CI is tiny and **misses** the truth. Using the honest estimators, a per-slot popularity policy looks ~**2.1×** the logger on a chronological hold-out — a candidate for a confirmatory A/B, not a shipped result.
+On the Open Bandit Dataset the answer is yes, within **5.3–6.1 %** relative error. IPW / SNIPW / DR estimates from uniform-random logs land near the production Bernoulli-TS CTR, and their 95 % bootstrap CIs cover it. Direct Method’s CI is tiny and misses the truth. With the honest estimators, a per-slot popularity policy looks about **2.1×** the logger on a chronological hold-out — worth an A/B, not a ship decision by itself.
 
-| | |
-|---|---|
-| **90 s path** | [`docs/DEMO.md`](docs/DEMO.md) · numbers = [`results.json`](results.json) (seed 0) |
-| **Reproduce** | `pytest -q` (no download) · full campaign needs the public zip (~15 min) |
-| **Stack** | Python 3.10+ · GBDT reward model · DM / IPW / SNIPW / DR · 200 bootstrap CIs |
-| **Limit** | Fashion e-commerce OBD, not aerospace. Estimated lift ≠ observed A/B. |
+> **Start here:** [`docs/DEMO.md`](docs/DEMO.md) · numbers in [`results.json`](results.json) (seed 0)  
+> **Stack:** Python 3.10+ · GBDT reward model · DM / IPW / SNIPW / DR · 200 bootstrap CIs  
+> **Limit:** fashion e-commerce OBD, not aerospace; estimated lift ≠ observed A/B
+
+[Data](#data) · [Method](#method) · [Results](#results) · [Takeaways](#takeaways) · [Reproduce](#reproduce)
 
 ## Data
 
-[Open Bandit Dataset](https://research.zozo.com/data_release/open_bandit_dataset.zip) (Saito et al., NeurIPS Datasets & Benchmarks 2021; ZOZOTOWN; CC BY 4.0). Two campaigns, same 7 days:
+[Open Bandit Dataset](https://research.zozo.com/data_release/open_bandit_dataset.zip) (Saito et al., NeurIPS Datasets & Benchmarks 2021; ZOZOTOWN; CC BY 4.0). Two campaigns ran over the same seven days:
 
 | Log | Policy | Rounds | Clicks | CTR |
 |---|---|---:|---:|---:|
 | `random/all` | uniform over 80 items × 3 slots (propensity 1/80) | 1,374,327 | 4,768 | 0.347% |
 | `bts/all` | production Bernoulli Thompson Sampling | 12,357,200 | 61,208 | 0.495% |
 
-Context: 4 categorical user features (one-hot, 24 dims) + slot; 80 user–item affinity scores.
+Context: four categorical user features (one-hot, 24 dims) + slot; 80 user–item affinity scores.
 
 ![EDA](figures/eda.png)
 
-Clicks are rare (0.35%), so variance is the main enemy. Slot effect is small; item CTRs span 0.115%–0.784% (median 0.332%).
+Clicks are rare (0.35%), so variance is the main enemy. The slot effect is small; item CTRs span 0.115%–0.784% (median 0.332%).
 
 ## Method
 
-- **Estimators** (`src/cbope/estimators.py`): DM, IPW, self-normalised IPW, Doubly Robust; 95 % percentile bootstrap (200 resamples).
-- **Reward model** (`reward_model.py`): GBDT on context + item id + affinity, **2-fold cross-fitted** so DR never corrects a row it trained on.
-- **Policies** (`policies.py`): uniform, per-slot smoothed popularity, model-greedy, production BTS, ε-greedy, disjoint LinUCB (Sherman–Morrison).
-- **Design**
-  - *E1:* estimate BTS value from random logs only; compare to on-policy BTS CTR.
-  - *E2:* chronological 70/30; learn on first 70%, evaluate off-policy on last 412,299 rounds.
-  - *E3:* replay evaluation (Li et al., 2011) — unbiased because the logger is uniform.
+- **Estimators** (`src/cbope/estimators.py`) — DM, IPW, self-normalised IPW, Doubly Robust; 95 % percentile bootstrap (200 resamples).
+- **Reward model** (`reward_model.py`) — GBDT on context + item id + affinity, **2-fold cross-fitted** so DR never corrects a row it trained on.
+- **Policies** (`policies.py`) — uniform, per-slot smoothed popularity, model-greedy, production BTS, ε-greedy, disjoint LinUCB (Sherman–Morrison).
+
+Three experiments:
+
+1. **E1 — estimator check.** Estimate BTS value from random logs only; compare to on-policy BTS CTR.
+2. **E2 — policy selection.** Chronological 70/30; learn on the first 70%, evaluate off-policy on the last 412,299 rounds.
+3. **E3 — online learners.** Replay evaluation (Li et al., 2011) — unbiased because the logger is uniform.
 
 ## Results
 
 Every number below comes from `scripts/run_experiments.py` (seed 0) → [`results.json`](results.json).
 
-**E1 — recover a known truth.** Ground truth = 0.4953% (BTS on-policy CTR).
+### E1 — recover a known truth
+
+Ground truth = 0.4953% (BTS on-policy CTR).
 
 | Estimator | Estimate | 95% CI | Rel. error | CI covers truth |
 |---|---:|---|---:|:-:|
@@ -53,7 +56,9 @@ Every number below comes from `scripts/run_experiments.py` (seed 0) → [`result
 
 DM is precise but over-confident: the classic failure of a model-only estimate with no importance-weight correction.
 
-**E2 — which policy would you ship?** (held-out last 30%; logger CTR = 0.3590%)
+### E2 — which policy would you ship?
+
+Held-out last 30%; logger CTR = 0.3590%.
 
 | Policy | SNIPW | DR (95% CI) |
 |---|---:|---|
@@ -64,7 +69,9 @@ DM is precise but over-confident: the classic failure of a model-only estimate w
 
 The reward model barely beats the base rate on held-out days (AUC 0.626), so greedy argmax over it is noisy and the simpler popularity policy wins. Its CI is wide (~1/80 of logged rounds match). Treat it as an A/B candidate, not a shipped result.
 
-**E3 — online learners (replay over 1.37 M rounds)**
+### E3 — online learners
+
+Replay over 1.37 M rounds.
 
 | Learner | Matched rounds | CTR (95% CI) |
 |---|---:|---|
@@ -93,8 +100,6 @@ pytest -q                                                                       
 ```
 
 `obp` is used only for the production BTS action distribution; estimators, policies and models live in this repo.
-
-## Layout
 
 ```
 src/cbope/   data.py · estimators.py · reward_model.py · policies.py · replay.py
