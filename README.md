@@ -2,11 +2,11 @@
 
 ![CI](https://github.com/lyftium/off-policy-bandit-evaluation/actions/workflows/ci.yml/badge.svg)
 
-Estimate a new recommender’s value from someone else’s logs before A/B.
+Can you tell whether a new recommender is better **before** you burn an A/B test?
 
-From uniform-random ZOZOTOWN logs, IPW / SNIPW / DR recover production BTS CTR within **5.3–6.1 %** relative error; 95 % bootstrap CIs cover the truth (DM’s CI does not). Chronological hold-out: per-slot popularity ≈ **2.1×** logger CTR — an A/B candidate, not a shipped lift.
+I ran that question on ZOZOTOWN’s Open Bandit Dataset. From the uniform-random logs alone, IPW / SNIPW / DR land within **5.3–6.1 %** of the production Bernoulli-TS CTR, and their 95 % bootstrap CIs cover the truth. Direct Method looks precise and misses. On a chronological hold-out, a per-slot popularity policy comes out around **2.1×** the logger — a candidate for A/B, not a ship decision from the estimate alone.
 
-[`docs/DEMO.md`](docs/DEMO.md) · numbers: [`results.json`](results.json) (seed 0) · fashion OBD, not domain transfer
+Everything below is in [`results.json`](results.json) (seed 0). Fashion e-commerce logs, not aerospace. Screener path: [`docs/DEMO.md`](docs/DEMO.md).
 
 [Data](#data) · [Method](#method) · [Results](#results) · [Takeaways](#takeaways) · [Reproduce](#reproduce)
 
