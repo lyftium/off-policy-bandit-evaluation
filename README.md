@@ -1,14 +1,12 @@
-# Off-policy evaluation on 1.37 M real bandit logs
+# Off-policy evaluation on 1.37 M Open Bandit logs
 
 ![CI](https://github.com/lyftium/off-policy-bandit-evaluation/actions/workflows/ci.yml/badge.svg)
 
-Can you rank a new recommendation policy from another policy’s logs **before** an A/B test?
+Estimate a new recommender’s value from someone else’s logs before A/B.
 
-On the Open Bandit Dataset the answer is yes, within **5.3–6.1 %** relative error. IPW / SNIPW / DR estimates from uniform-random logs land near the production Bernoulli-TS CTR, and their 95 % bootstrap CIs cover it. Direct Method’s CI is tiny and misses the truth. With the honest estimators, a per-slot popularity policy looks about **2.1×** the logger on a chronological hold-out — worth an A/B, not a ship decision by itself.
+From uniform-random ZOZOTOWN logs, IPW / SNIPW / DR recover production BTS CTR within **5.3–6.1 %** relative error; 95 % bootstrap CIs cover the truth (DM’s CI does not). Chronological hold-out: per-slot popularity ≈ **2.1×** logger CTR — an A/B candidate, not a shipped lift.
 
-**Start here:** [`docs/DEMO.md`](docs/DEMO.md) — every number below is in [`results.json`](results.json) (seed 0).
-
-Python 3.10+, a GBDT reward model, DM / IPW / SNIPW / DR with 200 bootstrap CIs. Domain is fashion e-commerce OBD, not aerospace; estimated lift is not an observed A/B.
+[`docs/DEMO.md`](docs/DEMO.md) · numbers: [`results.json`](results.json) (seed 0) · fashion OBD, not domain transfer
 
 [Data](#data) · [Method](#method) · [Results](#results) · [Takeaways](#takeaways) · [Reproduce](#reproduce)
 
