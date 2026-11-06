@@ -1,18 +1,16 @@
-# Off-Policy Evaluation of Recommendation Policies on 1.37M Real Bandit Logs
+# Off-policy evaluation of recommendation policies
 
 ![CI](https://github.com/lyftium/off-policy-bandit-evaluation/actions/workflows/ci.yml/badge.svg)
 
-![python](https://img.shields.io/badge/python-3.10%2B-blue) ![license](https://img.shields.io/badge/license-MIT-green)
+Can we score a new recommendation policy from logs collected under a different policy, before an A/B test?
 
-| | |
-|---|---|
-| **Problem** | Can we rank a new recommendation policy from logs of a different policy before an A/B test? |
-| **Verify** | [`docs/DEMO.md`](docs/DEMO.md) · `pytest -q` (no data download) · [`results.json`](results.json) from `scripts/run_experiments.py` (seed 0) |
-| **Status** | Real Open Bandit Dataset; unit tests offline. Full campaign needs the public zip (~15 min). CI enabled on `main`. Release example: [`releases/example-obd-seed0.json`](releases/example-obd-seed0.json). |
+I implemented the estimators, the chronological train/test split, and the bootstrap intervals in this repository. The logs are the public [Open Bandit Dataset](https://research.zozo.com/data_release/open_bandit_dataset.zip) (ZOZOTOWN fashion, CC BY 4.0). `obp` is used only to read the production policy’s action distribution.
 
-**Answer (on real data).** Yes, within **5.3–6.1 %** relative error. Estimates computed only from uniform-random logs land close to the actual on-policy CTR of the production policy, and the 95 % CIs of IPW, SNIPW and DR cover it. Direct Method’s CI is tiny and misses. Using those estimators, a simple per-slot popularity policy learned on the first 70 % of the week is estimated at **~2.1× the logging policy’s CTR** on the held-out 30 % — a candidate for a confirmatory A/B, not a shipped result from the estimate alone.
+From the uniform-random logs alone (1.37 million rounds), IPW, SNIPW, and doubly robust estimates land within about 5.3–6.1% of the production Bernoulli-TS click-through rate, and their 95% bootstrap intervals cover that reference. The direct method’s interval is much tighter and misses it. On a later time split, a per-slot popularity policy looks about twice the logger — useful as a candidate for an experiment, not as a shipped lift. Every digit below is in [`results.json`](results.json) (seed 0).
 
-Fashion e-commerce OBD logs (ZOZOTOWN), not aerospace.
+This is an offline estimate on public e-commerce logs. No live A/B was run.
+
+Unit tests need no download (`pytest -q`). The full campaign needs the public zip and about 15 minutes. Walkthrough: [`docs/DEMO.md`](docs/DEMO.md).
 
 [Data](#data) · [Method](#method) · [Results](#results) · [Takeaways](#takeaways) · [Reproduce](#reproduce)
 
