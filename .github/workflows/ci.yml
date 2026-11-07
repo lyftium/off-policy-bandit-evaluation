@@ -1,5 +1,3 @@
-# CI-ready: copy into .github/workflows/ via scripts/install-github-actions.sh
-# once the repo token has `workflow` scope.
 name: ci
 on:
   push:
